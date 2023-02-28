@@ -14,10 +14,10 @@ which will produce:
 You can run the whole pipeline like so:
 
 ```
-./LIN-kraken-db-pipeline.sh $(pwd)/input.txt xyz 
+./LIN-kraken-db-pipeline.sh input.txt xyz 
 ```
 
-Then add the genomes to the taxonomy like so:
+Then add the above taxonomy to a custon database for Kraken2, like so:
 ```
 for i in xyz/genomes_taxids/*.fna;
 do
