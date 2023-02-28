@@ -1,4 +1,4 @@
-# LIN parsing code for kraken2
+# Creating LIN taxonomy for metagenomic classification
 
 Run:
 ```
