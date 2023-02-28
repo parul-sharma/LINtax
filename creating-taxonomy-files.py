@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-'''Usage: ./creating-taxonomy-files.py $input_data_file_with_LINS '''
+'''Usage: ./creating-taxonomy-files.py --in_file $input_data_file_with_LINS --names-dmp-out names.dmp --nodes-dmp-out nodes.dmp'''
 
 import sys
 import pandas as pd
