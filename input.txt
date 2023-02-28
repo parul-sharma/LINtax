@@ -1,0 +1,6 @@
+LIN	Species	Strain	FileName	Accession
+15,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0	Xylella fastidiosa	CFBP8351	GCF_004016405.1_ASM401640v1_genomic.fna	GCF_004016405.1
+15,3,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0	Xylella fastidiosa	CFBP8078	GCF_004016365.1_ASM401636v1_genomic.fna	GCF_004016365.1
+15,3,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0	Xylella fastidiosa	CFBP7969	GCF_004016275.1_ASM401627v1_genomic.fna	GCF_004016275.1
+15,3,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0	Xylella fastidiosa	ESVL	GCF_004023385.1_ASM402338v1_genomic.fna	GCF_004023385.1
+15,3,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0	Xylella fastidiosa	IVIA5901	GCF_004023395.2_ASM402339v2_genomic.fna	GCF_004023395.2
