@@ -1,4 +1,4 @@
-# LINS parsing code for kraken2
+# LIN parsing code for kraken2
 
 Run:
 ```
