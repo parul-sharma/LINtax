@@ -16,7 +16,7 @@ mkdir -p $o_dir/taxonomy
 
 ###step1: creating taxonomy files
 cd $o_dir/taxonomy
-python $dir/creating-taxonomy-files.py ${in_file}
+python $dir/creating-taxonomy-files.py --in_file ${in_file} --names-dmp-out $o_dir/taxonomy/names.dmp --nodes-dmp-out $o_dir/taxonomy/nodes.dmp
 
 cd $dir
 ##keep in mind to removing the header from the file
