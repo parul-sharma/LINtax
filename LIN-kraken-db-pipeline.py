@@ -36,7 +36,7 @@ with open(input_file) as f:
         #unique_LINs.add(LIN)
         unique_lines[LIN] = line # store the line with the LIN as key
         line_count += 1  # increment line count
-        print(unique_lines.keys())
+        #print(unique_lines.keys())
 
 # Check if all LINs are unique
 new_file_created = False
