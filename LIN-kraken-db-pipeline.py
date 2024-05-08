@@ -17,7 +17,46 @@ output_dir = args.output_dir
 step = args.step
 
 dir = os.getcwd()
+# Get the directory of input_file
+input_dir = os.path.dirname(input_file)
 
+# Create a dictionary to store lines with unique LINs
+unique_lines = {}
+line_count = 0  # count of total lines
+#all_LINs = []
+
+# Read the input file and create a set and list of LINs
+with open(input_file) as f:
+    header = f.readline() # read header 
+    #lines = f.readlines() # read the rest of the lines
+    #next(f)  # skip header
+    for line in f:
+        LIN = line.strip().split('\t')[0]  # assuming LIN is at column 1
+        #all_LINs.append(LIN)
+        #unique_LINs.add(LIN)
+        unique_lines[LIN] = line # store the line with the LIN as key
+        line_count += 1  # increment line count
+        print(unique_lines.keys())
+
+# Check if all LINs are unique
+new_file_created = False
+if len(unique_lines) < line_count:
+    # If not, create a new file with lines with unique LINs
+    unique_input_file = os.path.join(input_dir, "unique_input_file.txt")
+    #unique_LINs_copy = unique_LINs.copy()  # create a copy of unique_LINs
+    with open(unique_input_file, "a") as f_out:
+        f_out.write(header)  # write header to new file
+          # skip header for the rest of the comparisons
+        for line in unique_lines.values():
+            f_out.write(line)
+    new_file_created = True
+else:
+    print("All LINs are unique. No new file created.")
+
+# Use the new file if it was created, otherwise use the original input file
+input_file_to_use = unique_input_file if new_file_created else input_file
+
+# The rest of your code here, using input_file_to_use instead of input_file
 try:
     # Making result directories
     os.makedirs(os.path.join(output_dir, 'genomes'), exist_ok=True)
@@ -27,15 +66,15 @@ try:
     if step is None or step == 1:
         # Step 1: creating taxonomy files
         os.chdir(os.path.join(output_dir, 'taxonomy'))
-        subprocess.run(['python', os.path.join(dir, 'creating-taxonomy-files.py'), input_file], check=True)
+        subprocess.run(['python', os.path.join(dir, 'creating-taxonomy-files.py'), input_file_to_use], check=True)
         os.chdir(dir)
 
     # Keep in mind to remove the header from the file
-    with open(input_file) as f:
+    with open(input_file_to_use) as f:
         next(f)  # skip header
         for line in f:
             line = line.strip().split('\t')
-            acc_id = line[4]
+            acc_id = line[4] # assuming accession id is at column 5
 
             if step is None or step == 2:
                 # Step 2: downloading genome
