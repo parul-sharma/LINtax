@@ -8,7 +8,7 @@ import sys
 parser = argparse.ArgumentParser(description='LIN-kraken-db-pipeline script.')
 parser.add_argument('input_file', metavar='input_file', type=str, help='Input LIN file')
 parser.add_argument('output_dir', metavar='output_dir', type=str, help='Output directory')
-parser.add_argument('-s', '--step', metavar='step', type=int, choices=[1, 2, 3, 4], help='Step to run (1-4)')
+parser.add_argument('-s', '--step', metavar='step', type=int, choices=[1, 2, 3, 4], help='Step to run (1-4): By default runs steps 1,3,4. Input genomes downloaded only whne specified (step 2)')
 
 args = parser.parse_args()
 
@@ -76,7 +76,7 @@ try:
             line = line.strip().split('\t')
             acc_id = line[4] # assuming accession id is at column 5
 
-            if step is None or step == 2:
+            if step == 2:
                 # Step 2: downloading genome
                 try:
                     subprocess.run([os.path.join(dir, 'genome_download.sh'), acc_id, os.path.join(output_dir, 'genomes')], check=True)
@@ -98,7 +98,8 @@ try:
                 # Step 4: change header of genome files
                 genome_file = line[3]
                 try:
-                    subprocess.run(['gunzip', '-d', os.path.join(output_dir, 'genomes', genome_file + '.gz')], check=True)
+                    if genome_file.endswith(".gz"):
+                        subprocess.run(['gunzip', '-d', os.path.join(output_dir, 'genomes', genome_file + '.gz')], check=True)
                     subprocess.run(['cp', os.path.join(output_dir, 'genomes', genome_file), os.path.join(output_dir, 'new_genomes_taxids')], check=True)
                     subprocess.run([os.path.join(dir, 'new_change_header.sh'), os.path.join(output_dir, 'new_genomes_taxids', genome_file), taxid], check=True)
                     print("Header changed")
