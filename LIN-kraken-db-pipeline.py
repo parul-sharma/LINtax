@@ -8,7 +8,7 @@ import sys
 parser = argparse.ArgumentParser(description='LIN-kraken-db-pipeline script.')
 parser.add_argument('input_file', metavar='input_file', type=str, help='Input LIN file')
 parser.add_argument('output_dir', metavar='output_dir', type=str, help='Output directory')
-parser.add_argument('-s', '--step', metavar='step', type=int, choices=[1, 2, 3, 4], help='Step to run (1-4): By default runs steps 1,3,4. Input genomes downloaded only whne specified (step 2)')
+parser.add_argument('-s', '--step', metavar='step', type=int, choices=[1, 2, 3, 4], help='Step to run (1-4): By default runs steps 1,3,4. Input genomes downloaded only when specified (step 2)')
 
 args = parser.parse_args()
 
@@ -101,7 +101,7 @@ try:
                     if genome_file.endswith(".gz"):
                         subprocess.run(['gunzip', '-d', os.path.join(output_dir, 'genomes', genome_file + '.gz')], check=True)
                     subprocess.run(['cp', os.path.join(output_dir, 'genomes', genome_file), os.path.join(output_dir, 'new_genomes_taxids')], check=True)
-                    subprocess.run([os.path.join(dir, 'new_change_header.sh'), os.path.join(output_dir, 'new_genomes_taxids', genome_file), taxid], check=True)
+                    subprocess.run([os.path.join(dir, 'change_header.sh'), os.path.join(output_dir, 'new_genomes_taxids', genome_file), taxid], check=True)
                     print("Header changed")
                 except subprocess.CalledProcessError as e:
                     print(f"Error changing header for genome file {genome_file}: {e}", file=sys.stderr)

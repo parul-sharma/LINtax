@@ -140,6 +140,8 @@ def main():
         
         i=i+1
 
+    data['taxid_LIN'] = data['taxid_LIN'].apply(lambda x: ','.join(map(str, x)))
+    data['parent_LIN'] = data['parent_LIN'].apply(lambda x: ','.join(map(str, x)))
     print(data)
     data.to_csv(args.intermediate_results, sep='\t',  index=False)
 
