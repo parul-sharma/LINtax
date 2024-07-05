@@ -1,4 +1,30 @@
-# Creating LIN taxonomy for metagenomic classification
+# LINtax: Custom taxonomy for metagenomic classification
+
+## Installation:
+
+.....
+## Usage:
+
+```
+lintax [command] <options>
+Commands:
+    create      - Create LINtax from input file and genomes directory
+    build       - Build the database using the output from 'lintax create'
+    classify    - Classify your metagenomic reads using the provided LINtax database
+    report      - Generate a final LIN using the results from   classification
+    help        - Show help
+```
+As shown above, there four main modules for lintax:
+* `create` -Creates the custom taxonomy structure using from a given list of genomes and their LINs. For assigning LINs to genomes, use linflow (https://code.vt.edu/linbaseproject/LINflow) to run the CLI version or visit the website, GenomeRxiv (http://genomerxiv.cs.vt.edu) to directly download them. 
+
+* `build` - Uses kraken2 commands to build the database using the custom taxonomy files created with the "create" step. It is essential to run create before running this module to get the necessary taxonomy structure.
+
+* `classify` - Uses kraken2 algorithm to classify any input sequence (fasta or fastq; paired or unpaired) with the custom database created above. You can run kraken2 using your own paramaters as well, if you wish so. Remember to create both kraken2 default output and the report stype output for further analysis.
+
+* `report` - Summarizes the results of Kraken2 in the LINgroup format. 
+
+
+
 
 Run:
 ```
@@ -35,8 +61,6 @@ kraken2 --db xyz metagenome_input.fastq
 ```
 LINtax: Create custom taxonomy for metagenome classification
 
-    This is LINtax version $version
-    Usage: $0 <command> [options]"
     Commands:
     create  - Create LINtax from input file and genomes directory
         Options:
