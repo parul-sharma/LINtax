@@ -1,0 +1,313 @@
+#!/bin/bash
+
+# Parul Sharma 2024-07
+# LINtax Tool Dispatcher
+
+version="1.0.0"
+
+# Function to display usage instructions
+usage() {
+    local command="$1"
+    case "$command" in
+        create)
+            cat << EOF
+    Usage: lintax create [options]
+    Options:
+        -i  or   --input          Specify input file [REQUIRED]
+        -g  or   --genomes        Specify directory containing input genomes [REQUIRED]
+        -o  or   --output         Name and path of output directory [REQUIRED]
+        Other options:
+        --download_genomes        Download assemblies listed in input file from NCBI
+        -h  or --help             Show usage
+    Example: lintax create -i linfile.tsv -g /path/to/dir -o /path/to/output
+EOF
+            ;;
+        build)
+            cat << EOF
+    Usage: lintax build [options]
+    Options:
+        -i  or  --input           Specify the output directory from 'lintax create' [REQUIRED]
+        -h  or --help             Show usage
+    Example: lintax build -i /output/from/create
+EOF
+            ;;
+        classify)
+            cat << EOF
+    Usage: lintax classify [options] <input_files>
+    Options:
+        --db                      LINtax Database to use for classifications (make sure to run build before this step) [REQUIRED]
+        --lins                    Text file containing lingroups (custom taxa) and their LIN prefixes [REQUIRED]
+        -o  or --output           LINreport containing the results [REQUIRED]
+        -h  or --help             Show usage
+        Other options:
+        -c  or --confidence       Specify the confidence threshold for kraken classification [optional]
+        --paired                  For paired-end reads
+    Example: for single reads - 
+        lintax classify --db /database/ --lins linfile.txt -o sample-results.tsv <sample.fastq>
+    for paired reads - 
+        lintax classify --db /database/ --lins linfile.txt -o sample-results.tsv --paired <sample_1.fastq> <sample_2.fastq>
+EOF
+            ;;
+        report)
+            cat << EOF
+    Usage: lintax report [options]
+    Options:
+        --lins                    Text file containing lingroups (custom taxa) and their LIN prefixes [REQUIRED]
+        -ko  or  --koutput        Default output file from kraken2 [REQUIRED]
+        -kr  or  --kreport        Report format output from kraken2 [REQUIRED]
+        -o   or  --output         LINreport containing the results [REQUIRED]
+        -h   or  --help           Show usage
+EOF
+            ;;
+        *)
+            cat << EOF
+    LINtax: Create custom taxonomy for metagenome classification
+
+    This is LINtax version $version
+    Usage: $0 <command> [options]
+    Commands:
+    create  - Create LINtax from input file and genomes directory
+    build   - Build the database using the output from 'lintax create'
+    classify - Classify your metagenomic reads using the provided LINtax database
+    report  - Generate a final LIN using the results from classification
+    help    - Show help
+
+For further explanation visit: https://github.com/parul-sharma/LIN-kraken2
+EOF
+            ;;
+    esac
+}
+
+# Check if no arguments were provided
+if [[ $# -eq 0 ]]; then
+    usage
+    exit 1
+fi
+
+# Parse command-line options
+command=$1
+shift
+
+case $command in
+    create)
+        # Parse create command options
+        input_file=
+        genome_dir=
+        output_dir=
+        download_genomes=false
+
+        while [[ $# -gt 0 ]]; do
+            key="$1"
+            case $key in
+                -i|--input)
+                    input_file="$2"
+                    shift 2
+                    ;;
+                -g|--genomes)
+                    genome_dir="$2"
+                    shift 2
+                    ;;
+                -o|--output)
+                    output_dir="$2"
+                    shift 2
+                    ;;
+                --download_genomes)
+                    download_genomes=true
+                    shift
+                    ;;
+                -h|--help)
+                    usage create
+                    exit 0
+                    ;;
+                *)
+                    echo "Unknown option: $1"
+                    usage create
+                    exit 1
+                    ;;
+            esac
+        done
+
+        # Check if required options are provided
+        if [[ -z $input_file || -z $genome_dir || -z $output_dir ]]; then
+            echo "Error: Missing required options for 'create' command."
+            usage create
+            exit 1
+        fi
+
+        # Execute create_lintax.py with specified options
+        python LINtax_create.py --genomes "$genome_dir" "$input_file" "$output_dir"
+        if $download_genomes; then
+            python LINtax_create.py --genomes "$genome_dir" "$output_dir" "$input_file" --step 2
+        fi
+        ;;
+    
+    build)
+        # Parse build command options
+        input_dir=
+
+        while [[ $# -gt 0 ]]; do
+            key="$1"
+            case $key in
+                -i|--input)
+                    input_dir="$2"
+                    shift 2
+                    ;;
+                -h|--help)
+                    usage build
+                    exit 0
+                    ;;
+                *)
+                    echo "Unknown option: $1"
+                    usage build
+                    exit 1
+                    ;;
+            esac
+        done
+
+        # Check if required options are provided
+        if [[ -z $input_dir ]]; then
+            echo "Error: Missing required options for 'build' command."
+            usage build
+            exit 1
+        fi
+
+        # Execute kraken commands with specified options
+        check_path="${input_dir}/genomes_with_taxids"
+        if [ -d "$check_path" ]; then
+            echo "Building database with genomes in $check_path"
+            echo "All fasta files must end with .fna"
+            for file in ${input_dir}/genomes_with_taxids/*.fna; do
+                kraken2-build --add-to-library "$file" --db "$input_dir"
+            done
+        else
+            echo "Directory $check_path does not exist."
+            echo "Make sure to run lintax create to generate the tax modified files."
+        fi
+
+        ;;
+    
+    classify)
+        # Parse classify command options
+        db=
+        lins=
+        output_file=
+        confidence=
+        paired=false
+
+        while [[ $# -gt 0 ]]; do
+            key="$1"
+            case $key in
+                --db)
+                    db="$2"
+                    shift 2
+                    ;;
+                --lins)
+                    lins="$2"
+                    shift 2
+                    ;;
+                -o|--output)
+                    output_file="$2"
+                    shift 2
+                    ;;
+                -c|--confidence)
+                    confidence="$2"
+                    shift 2
+                    ;;
+                --paired)
+                    paired=true
+                    shift
+                    ;;
+                -h|--help)
+                    usage classify
+                    exit 0
+                    ;;
+                *)
+                    break
+                    ;;
+            esac
+        done
+
+        # Check if required options are provided
+        if [[ -z $db || -z $output_file || -z $lins ]]; then
+            echo "Error: Missing required options for 'classify' command."
+            usage classify
+            exit 1
+        fi
+
+        # Collect remaining arguments as input files
+        input_files=("$@")
+        for file in "${input_files[@]}"; do
+            # Get the base name of the file
+            base_name=$(basename "$file")
+
+            # Execute classify_reads.py with specified options
+            if $paired; then
+                kraken2 --db "$db" ${confidence:+--confidence "$confidence"} --paired "${input_files[@]}" --report ${base_name}.kreport --output ${base_name}.output
+                python report-lin.py --lin_file "$lins" --data-file $db/taxonomy/data.txt --in_file_report ${base_name}.kreport --in_file_output ${base_name}.output --output "$output_file"
+            else
+                kraken2 --db "$db" ${confidence:+--confidence "$confidence"} "${input_files[@]}" --report ${base_name}.kreport --output ${base_name}.output
+                python report-lin.py --lin_file "$lins" --data-file $db/taxonomy/data.txt --in_file_report ${base_name}.kreport --in_file_output ${base_name}.output --output "$output_file"
+            fi
+        done
+        ;;
+    
+    report)
+        # Parse report command options
+        koutput=
+        kreport=
+        lins=
+        output_file=
+
+        while [[ $# -gt 0 ]]; do
+            key="$1"
+            case $key in
+                -ko|--koutput)
+                    koutput="$2"
+                    shift 2
+                    ;;
+                -kr|--kreport)
+                    kreport="$2"
+                    shift 2
+                    ;;
+                --lins)
+                    lins="$2"
+                    shift 2
+                    ;;
+                -o|--output)
+                    output_file="$2"
+                    shift 2
+                    ;;
+                -h|--help)
+                    usage report
+                    exit 0
+                    ;;
+                *)
+                    echo "Unknown option: $1"
+                    usage report
+                    exit 1
+                    ;;
+            esac
+        done
+
+        # Check if required options are provided
+        if [[ -z $koutput || -z $kreport || -z $output_file || -z $lins ]]; then
+            echo "Error: Missing required options for 'report' command."
+            usage report
+            exit 1
+        fi
+
+        # Execute generate_report.py with specified options
+        python report-lin.py --lin_file "$lins" --data-file $db/taxonomy/data.txt --in_file_report "$kreport" --in_file_output "$koutput" --output "$output_file"
+        ;;
+    
+    help)
+        usage
+        exit 0
+        ;;
+    
+    *)
+        echo "Error: Unknown command '$command'."
+        usage
+        exit 1
+        ;;
+esac
