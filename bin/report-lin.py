@@ -65,20 +65,20 @@ def total_reads_length(taxids, in_output):
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument('--lin_file', help='txt file containing lingroup names and prefixes')
-    p.add_argument('--data_file', help='txt file containing the taxonomic details produced in the db construction step')
-    p.add_argument('--in_file_report', help='report output generated from kraken2 (condensed output file)')
-    p.add_argument('--in_file_output', help='default output generated from kraken2 (output file)')
+    p.add_argument('--lingroup', help='txt file containing lingroup names and prefixes')
+    p.add_argument('--taxdata', help='txt file containing the taxonomic details produced in the db construction step')
+    p.add_argument('--k_report', help='report output generated from kraken2 (condensed output file)')
+    p.add_argument('--k_output', help='default output generated from kraken2 (output file)')
     p.add_argument('--output')
     args = p.parse_args()
 
-    lin_file = pd.read_csv(args.lin_file, sep='\t')
-    data = pd.read_csv(args.data_file, sep='\t')
-    data['taxid_LIN'] = data['taxid_LIN'].str.replace("[\]\[]", '')
-    data['parent_LIN'] = data['parent_LIN'].str.replace("[\]\[]", '')
+    lin_file = pd.read_csv(args.lingroup, sep='\t')
+    data = pd.read_csv(args.taxdata, sep='\t')
+    #data['taxid_LIN'] = data['taxid_LIN'].str.replace("[\]\[]", '')
+    #data['parent_LIN'] = data['parent_LIN'].str.replace("[\]\[]", '')
 
-    in_file = pd.read_csv(args.in_file_report, sep='\t', header=None, index_col=False)
-    in_output = pd.read_csv(args.in_file_output, sep='\t', header=None, index_col=False)
+    in_file = pd.read_csv(args.k_report, sep='\t', header=None, index_col=False)
+    in_output = pd.read_csv(args.k_output, sep='\t', header=None, index_col=False)
 
     out_file = lin_file.copy()
     out_file['Assigned_reads'] = ''
@@ -106,14 +106,13 @@ def main():
 
     df = pd.DataFrame({"LINgroup_Name": ['Total_reads'], "Assigned_reads": [total_reads]})
     out_file = pd.concat([out_file, df], ignore_index=True)
-    #retain only lingroups with assignments
-    out_file_filtered = out_file[out_file['Percentage_assigned_reads'] != 0]
+    outfile_filtered = out_file[out_file['Percentage_assigned_reads'] != 0]
 
     #output_dir = os.path.dirname(args.output)
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
 
-    out_file_filtered.to_csv(args.output, sep=',', index=False)
+    outfile_filtered.to_csv(args.output, sep=',', index=False)
 
 if __name__ == '__main__':
     main()

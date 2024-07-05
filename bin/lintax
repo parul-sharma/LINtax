@@ -11,6 +11,10 @@ usage() {
     case "$command" in
         create)
             cat << EOF
+
+    ----------------------------------------------------------------------------------------
+    LINtax: Create custom taxonomy for metagenome classification                        
+    ----------------------------------------------------------------------------------------    
     Usage: lintax create [options]
     Options:
         -i  or   --input          Specify input file [REQUIRED]
@@ -24,6 +28,10 @@ EOF
             ;;
         build)
             cat << EOF
+
+    ----------------------------------------------------------------------------------------
+    LINtax: Create custom taxonomy for metagenome classification                        
+    ----------------------------------------------------------------------------------------
     Usage: lintax build [options]
     Options:
         -i  or  --input           Specify the output directory from 'lintax create' [REQUIRED]
@@ -33,6 +41,10 @@ EOF
             ;;
         classify)
             cat << EOF
+
+    ----------------------------------------------------------------------------------------
+    LINtax: Create custom taxonomy for metagenome classification                        
+    ----------------------------------------------------------------------------------------        
     Usage: lintax classify [options] <input_files>
     Options:
         --db                      LINtax Database to use for classifications (make sure to run build before this step) [REQUIRED]
@@ -50,9 +62,14 @@ EOF
             ;;
         report)
             cat << EOF
+
+    ----------------------------------------------------------------------------------------
+    LINtax: Create custom taxonomy for metagenome classification                        
+    ----------------------------------------------------------------------------------------        
     Usage: lintax report [options]
     Options:
         --lins                    Text file containing lingroups (custom taxa) and their LIN prefixes [REQUIRED]
+        --db                      LINtax Database to used for classifications [REQUIRED]
         -ko  or  --koutput        Default output file from kraken2 [REQUIRED]
         -kr  or  --kreport        Report format output from kraken2 [REQUIRED]
         -o   or  --output         LINreport containing the results [REQUIRED]
@@ -61,7 +78,10 @@ EOF
             ;;
         *)
             cat << EOF
-    LINtax: Create custom taxonomy for metagenome classification
+            
+    ----------------------------------------------------------------------------------------
+    LINtax: Create custom taxonomy for metagenome classification                        
+    ----------------------------------------------------------------------------------------
 
     This is LINtax version $version
     Usage: $0 <command> [options]
@@ -243,10 +263,10 @@ case $command in
             # Execute classify_reads.py with specified options
             if $paired; then
                 kraken2 --db "$db" ${confidence:+--confidence "$confidence"} --paired "${input_files[@]}" --report ${base_name}.kreport --output ${base_name}.output
-                python report-lin.py --lin_file "$lins" --data-file $db/taxonomy/data.txt --in_file_report ${base_name}.kreport --in_file_output ${base_name}.output --output "$output_file"
+                python report-lin.py --lingroup "$lins" --taxdata $db/taxonomy/data.txt --k_report ${base_name}.kreport --k_output ${base_name}.output --output "$output_file"
             else
                 kraken2 --db "$db" ${confidence:+--confidence "$confidence"} "${input_files[@]}" --report ${base_name}.kreport --output ${base_name}.output
-                python report-lin.py --lin_file "$lins" --data-file $db/taxonomy/data.txt --in_file_report ${base_name}.kreport --in_file_output ${base_name}.output --output "$output_file"
+                python report-lin.py --lingroup "$lins" --taxdata $db/taxonomy/data.txt --k_report ${base_name}.kreport --k_output ${base_name}.output --output "$output_file"
             fi
         done
         ;;
@@ -261,6 +281,10 @@ case $command in
         while [[ $# -gt 0 ]]; do
             key="$1"
             case $key in
+                --db)
+                    db="$2"
+                    shift 2
+                    ;;
                 -ko|--koutput)
                     koutput="$2"
                     shift 2
@@ -290,14 +314,14 @@ case $command in
         done
 
         # Check if required options are provided
-        if [[ -z $koutput || -z $kreport || -z $output_file || -z $lins ]]; then
+        if [[ -z $koutput || -z $kreport || -z $output_file || -z $lins || -z $db ]]; then
             echo "Error: Missing required options for 'report' command."
             usage report
             exit 1
         fi
 
         # Execute generate_report.py with specified options
-        python report-lin.py --lin_file "$lins" --data-file $db/taxonomy/data.txt --in_file_report "$kreport" --in_file_output "$koutput" --output "$output_file"
+        python report-lin.py --lingroup "$lins" --taxdata $db/taxonomy/data.txt --k_report "$kreport" --k_output "$koutput" --output "$output_file"
         ;;
     
     help)
