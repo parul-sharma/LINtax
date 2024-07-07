@@ -112,7 +112,7 @@ def main():
     #if not os.path.exists(output_dir):
     #    os.makedirs(output_dir)
 
-    outfile_filtered.to_csv(args.output, sep=',', index=False)
+    outfile_filtered.to_csv(args.output, sep='\t', index=False)
 
 if __name__ == '__main__':
     main()
