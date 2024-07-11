@@ -1,5 +1,13 @@
 # LINtax: Custom taxonomy for metagenomic classification
 
+[Installation](#installation) \
+[Usage](#usage) :
+  >  [creating taxonomy](#1-using-lintax-create) \
+  >  [building database](#2-using-lintax-build) \
+  >  [classifying metagenomes](#3-using-lintax-classify) \
+  >  [reporting lingroups](#4-using-lintax-report)
+
+
 ## Installation:
 To install LINtax simply clone this repository and add depencies through the yaml file provided. Use the following commands:
 ```
@@ -163,7 +171,7 @@ The output is a tab-seprated final report that includes the classification resul
 - `Percentage_unique_assigned_reads`: percentage of unique reads
 - `Total_reads_length`: total read length of the assigned reads (important for long-read assignments)
 
-### 3. Using `lintax report `
+### 4. Using `lintax report `
 Generate LINtax report from kraken outputs
 ```
 Usage:
@@ -182,7 +190,9 @@ You can use `lintax report` if you ran your own kraken2 commands for classificat
 
 The final report is generated similar to the result from `lintax classify`. 
 
-
+##
+Use the github issues tracker to add any comments or issues. \
+Email: parulsharma@vt.edu, if you want to get in touch. 
 
 
 
