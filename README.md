@@ -66,7 +66,7 @@ lintax create -i linfile.tsv -g /path/to/dir -o /path/to/output
 ```
 #### Required inputs 
 `-i or --input` : The input file requied which lists the genomes and their corresponding LINs. 
-For assigning LINs to genomes, use linflow (https://code.vt.edu/linbaseproject/LINflow) to run the CLI version or visit the website, GenomeRxiv (http://genomerxiv.cs.vt.edu) to directly download them. 
+For assigning LINs to genomes, use [linflow](https://code.vt.edu/linbaseproject/LINflow) to run the CLI version or visit the website, [GenomeRxiv](http://genomerxiv.cs.vt.edu) to directly download them. 
 
 The input file must have a column 'LIN' and 'Accession'. 
 
@@ -159,7 +159,7 @@ In this file, the groups follow a taxonomic convection A,B,C,D and so on. The na
 `-o  or --output` : name of the final report file and path
 
 `-c or --confidence` : specify the confidence scroring threshold. Recommended 0.1 (10%) for long reads and 0.3 (30%) or more for short reads. 
-[Read more about confidence thresholds : (https://github.com/DerrickWood/kraken2/wiki/Manual#confidence-scoring)
+[Read more about confidence thresholds](https://github.com/DerrickWood/kraken2/wiki/Manual#confidence-scoring)
 
 #### Description of output
 The output is a tab-seprated final report that includes the classification results with the following columns:
@@ -190,9 +190,13 @@ You can use `lintax report` if you ran your own kraken2 commands for classificat
 
 The final report is generated similar to the result from `lintax classify`. 
 
-##
-Use the github issues tracker to add any comments or issues. \
-Email: parulsharma@vt.edu, if you want to get in touch. 
+## Resources
+For a step-by-step demo: [click here](https://hackmd.io/Iz8wZZirRQWyzzR2kQh1QQ?both) \
+Learn more about LINtax: [click here](https://github.com/vinatzer-lab/ICPPB2024_workshop/blob/main/Part3-ICPPB2024-workshop.pdf) \
+Learn more about LINs : [click here](https://pubmed.ncbi.nlm.nih.gov/33828908/)
+
+###### Use the github issues tracker to add any comments or issues. 
+###### Email parulsharma@vt.edu, if you want to get in touch. 
 
 
 
