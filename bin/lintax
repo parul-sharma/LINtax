@@ -199,6 +199,7 @@ case $command in
             for file in ${input_dir}/genomes_with_taxids/*.fna; do
                 kraken2-build --add-to-library "$file" --db "$input_dir"
             done
+            kraken2-build --build --db "$input_dir"
         else
             echo "Directory $check_path does not exist."
             echo "Make sure to run lintax create to generate the tax modified files."
