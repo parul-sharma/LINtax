@@ -113,7 +113,7 @@ try:
                 genome_file = line[3]
                 try:
                     if genome_file.endswith(".gz"):
-                        subprocess.run(['gunzip', '-d', os.path.join(genomes_dir, genome_file + '.gz')], check=True)
+                        subprocess.run(['gunzip', '-d', os.path.join(genomes_dir, genome_file)], check=True)
                     subprocess.run(['cp', os.path.join(genomes_dir, genome_file), os.path.join(output_dir, 'genomes_with_taxids')], check=True)
                     subprocess.run([os.path.join(dir, 'change_header.sh'), os.path.join(output_dir, 'genomes_with_taxids', genome_file), taxid], check=True)
                     print("Header changed")
